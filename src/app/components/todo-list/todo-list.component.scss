@@ -1,5 +1,5 @@
 .todo-container {
-    max-width: 600px;
+    max-width: 800px;
     margin: 20px auto;
     padding: 20px;
   }
@@ -9,13 +9,35 @@
     gap: 10px;
     margin-bottom: 20px;
   
-    input {
-      flex: 1;
+    input, select {
       padding: 8px;
+    }
+  
+    input[type="text"] {
+      flex: 1;
     }
   
     button {
       padding: 8px 16px;
+    }
+  }
+  
+  .filters {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  
+    .status-filter {
+      display: flex;
+      gap: 5px;
+  
+      button {
+        padding: 5px 10px;
+        &.active {
+          background-color: #007bff;
+          color: white;
+        }
+      }
     }
   }
   
@@ -30,13 +52,24 @@
       padding: 10px;
       border-bottom: 1px solid #eee;
   
+      &.overdue {
+        background-color: #ffe6e6;
+      }
+  
       .completed {
         text-decoration: line-through;
         color: #888;
       }
   
+      .todo-details {
+        flex: 1;
+        small {
+          display: block;
+          color: #666;
+        }
+      }
+  
       button {
-        margin-left: auto;
         padding: 4px 8px;
       }
     }

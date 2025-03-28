@@ -1,23 +1,52 @@
 <div class="todo-container">
     <h2>Todo List</h2>
-    
+  
     <div class="todo-input">
       <input 
         [(ngModel)]="newTodo"
         (keyup.enter)="addTodo()"
         placeholder="Add new todo"
       >
+      <select [(ngModel)]="selectedCategory">
+        <option value="" disabled selected>Select category</option>
+        <option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+      <input 
+        type="date"
+        [(ngModel)]="dueDate"
+      >
       <button (click)="addTodo()">Add</button>
     </div>
   
+    <div class="filters">
+      <div class="status-filter">
+        <button [class.active]="filterStatus === 'all'" (click)="setFilterStatus('all')">All</button>
+        <button [class.active]="filterStatus === 'active'" (click)="setFilterStatus('active')">Active</button>
+        <button [class.active]="filterStatus === 'completed'" (click)="setFilterStatus('completed')">Completed</button>
+      </div>
+      <select [(ngModel)]="filterCategory" (change)="setFilterCategory(filterCategory)">
+        <option value="all">All Categories</option>
+        <option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+    </div>
+  
     <ul class="todo-list">
-      <li *ngFor="let todo of todos" class="todo-item">
+      <li *ngFor="let todo of filteredTodos" class="todo-item" [class.overdue]="isOverdue(todo)">
         <input 
           type="checkbox"
           [checked]="todo.completed"
           (change)="toggleTodo(todo.id)"
         >
-        <span [class.completed]="todo.completed">{{ todo.title }}</span>
+        <div class="todo-details">
+          <span [class.completed]="todo.completed">{{ todo.title }}</span>
+          <small>{{ todo.category }} 
+            <span *ngIf="todo.dueDate"> - Due: {{ todo.dueDate | date:'shortDate' }}</span>
+          </small>
+        </div>
         <button (click)="removeTodo(todo.id)">Delete</button>
       </li>
     </ul>

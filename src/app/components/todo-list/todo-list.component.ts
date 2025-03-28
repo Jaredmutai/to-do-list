@@ -1,15 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-todo-list',
-//   imports: [],
-//   templateUrl: './todo-list.component.html',
-//   styleUrl: './todo-list.component.scss'
-// })
-// export class TodoListComponent {
-
-// }
-
 import { Component, OnInit } from '@angular/core';
 import { TodoService, Todo } from '../../services/todo.service';
 
@@ -20,18 +8,32 @@ import { TodoService, Todo } from '../../services/todo.service';
 })
 export class TodoListComponent implements OnInit {
   todos: Todo[] = [];
+  filteredTodos: Todo[] = [];
+  categories: string[] = [];
   newTodo: string = '';
+  selectedCategory: string = '';
+  dueDate: string = '';
+  filterStatus: 'all' | 'active' | 'completed' = 'all';
+  filterCategory: string = 'all';
 
   constructor(private todoService: TodoService) {}
 
   ngOnInit() {
-    this.todoService.todos$.subscribe(todos => this.todos = todos);
+    this.todoService.todos$.subscribe(todos => {
+      this.todos = todos;
+      this.applyFilters();
+    });
+    this.todoService.categories$.subscribe(categories => {
+      this.categories = categories;
+    });
   }
 
   addTodo() {
     if (this.newTodo.trim()) {
-      this.todoService.addTodo(this.newTodo);
+      const dueDate = this.dueDate ? new Date(this.dueDate) : null;
+      this.todoService.addTodo(this.newTodo, this.selectedCategory, dueDate);
       this.newTodo = '';
+      this.dueDate = '';
     }
   }
 
@@ -41,5 +43,35 @@ export class TodoListComponent implements OnInit {
 
   removeTodo(id: number) {
     this.todoService.removeTodo(id);
+  }
+
+  applyFilters() {
+    let filtered = [...this.todos];
+    
+    if (this.filterStatus !== 'all') {
+      filtered = filtered.filter(todo => 
+        this.filterStatus === 'completed' ? todo.completed : !todo.completed
+      );
+    }
+
+    if (this.filterCategory !== 'all') {
+      filtered = filtered.filter(todo => todo.category === this.filterCategory);
+    }
+
+    this.filteredTodos = filtered;
+  }
+
+  setFilterStatus(status: 'all' | 'active' | 'completed') {
+    this.filterStatus = status;
+    this.applyFilters();
+  }
+
+  setFilterCategory(category: string) {
+    this.filterCategory = category;
+    this.applyFilters();
+  }
+
+  isOverdue(todo: Todo): boolean {
+    return todo.dueDate && !todo.completed && todo.dueDate < new Date();
   }
 }
